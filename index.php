@@ -58,13 +58,13 @@
             background-color: white;
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
             text-align: center;
-            margin-top: 50px;
+            height: 100%;
         }
 
         .login-box h2 {
             font-size: 1.8rem;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
 
         .login-box p {
@@ -73,10 +73,11 @@
             margin-bottom: 20px;
         }
 
+        /* Tombol Login dan Daftar Klien (kotak kecil) */
         .login-box .btn-login {
             display: inline-block;
-            padding: 12px 25px;
-            font-size: 1.1rem;
+            padding: 12px 20px;
+            font-size: 1rem;
             font-weight: bold;
             background-color: #007bff;
             color: white;
@@ -84,6 +85,8 @@
             border-radius: 8px;
             text-decoration: none;
             transition: all 0.3s ease;
+            margin-top: 10px;
+            width: 100%;
         }
 
         .login-box .btn-login:hover {
@@ -91,6 +94,14 @@
             color: #fff;
             text-decoration: none;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-box .btn-login.secondary {
+            background-color: #28a745;
+        }
+
+        .login-box .btn-login.secondary:hover {
+            background-color: #218838;
         }
 
         /* Footer */
@@ -105,6 +116,13 @@
         .custom-footer p {
             margin: 0;
             font-size: 0.9rem;
+        }
+
+        /* Responsif untuk kolom */
+        @media (max-width: 767px) {
+            .col-md-4 {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -124,26 +142,34 @@
 
     <!-- Login Box -->
     <div class="container mt-5">
-    <div class="row justify-content-center">
-        <!-- Login Admin -->
-        <div class="col-md-4">
-            <div class="login-box">
-                <h2>Login Admin</h2>
-                <p>Masuk sebagai admin untuk mengelola data klien dan konsultasi pajak.</p>
-                <a href="login.php" class="btn-login">Masuk Sekarang</a>
+        <div class="row justify-content-center d-flex">
+            <!-- Login Admin -->
+            <div class="col-md-4 mb-4 d-flex">
+                <div class="login-box flex-fill">
+                    <h2>Login Admin</h2>
+                    <p>Masuk sebagai admin untuk mengelola data klien dan konsultasi pajak.</p>
+                    <a href="login.php" class="btn-login">Login</a>
+                </div>
             </div>
-        </div>
-        <!-- Login Konsultan -->
-        <div class="col-md-4">
-            <div class="login-box">
-                <h2>Login Konsultan</h2>
-                <p>Masuk sebagai konsultan untuk melihat klien dan riwayat konsultasi.</p>
-                <a href="login_consultant.php" class="btn-login">Masuk Sekarang</a>
+            <!-- Login Konsultan -->
+            <div class="col-md-4 mb-4 d-flex">
+                <div class="login-box flex-fill">
+                    <h2>Login Konsultan</h2>
+                    <p>Masuk sebagai konsultan untuk melihat klien dan riwayat konsultasi.</p>
+                    <a href="login_consultant.php" class="btn-login">Login</a>
+                </div>
+            </div>
+            <!-- Login dan Daftar Klien -->
+            <div class="col-md-4 mb-4 d-flex">
+                <div class="login-box flex-fill">
+                    <h2>Login & Daftar Klien</h2>
+                    <p>Masuk atau daftar untuk mengakses layanan konsultan pajak.</p>
+                    <a href="login_client.php" class="btn-login">Login</a>
+                    <a href="register_client.php" class="btn-login secondary mt-3">Daftar</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
-
 
     <!-- Custom Footer -->
     <div class="custom-footer">

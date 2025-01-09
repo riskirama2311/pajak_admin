@@ -11,6 +11,34 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'consultant') {
 // Ambil daftar klien
 $clients_query = $conn->query("SELECT id, name, email, address, phone, description FROM client ORDER BY name ASC");
 $clients = $clients_query->fetch_all(MYSQLI_ASSOC);
+
+// Proses penghapusan klien
+if (isset($_POST['delete_client'])) {
+    $client_id = $_POST['id'];
+
+    // Ambil data klien yang akan dihapus
+    $client_query = $conn->query("SELECT * FROM client WHERE id = $client_id");
+    $client = $client_query->fetch_assoc();
+
+    // Simpan data klien yang dihapus ke tabel riwayat
+    $insert_riwayat = "INSERT INTO riwayat_konsultasi (client_id, name, email, description) 
+                        VALUES (?, ?, ?, ?)";
+    $stmt = $conn->prepare($insert_riwayat);
+    $stmt->bind_param("isss", $client['id'], $client['name'], $client['email'], $client['description']);
+    $stmt->execute();
+
+    // Hapus klien dari tabel client
+    $delete_query = "DELETE FROM client WHERE id = ?";
+    $stmt = $conn->prepare($delete_query);
+    $stmt->bind_param("i", $client_id);
+    if ($stmt->execute()) {
+        $_SESSION['message'] = "Klien berhasil dihapus dan dicatat ke riwayat!";
+        header("Location: Konsultanclients.php");
+        exit();
+    } else {
+        $_SESSION['error'] = "Terjadi kesalahan saat menghapus klien.";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -152,16 +180,20 @@ $clients = $clients_query->fetch_all(MYSQLI_ASSOC);
             background-color: #dc3545;
             color: white;
             border: none;
-            padding: 5px 10px;
+            padding: 6px 12px;
             border-radius: 5px;
-            font-size: 12px;
-            transition: all 0.3s ease;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
         .btn-delete:hover {
             background-color: #c82333;
-            color: #fff;
-            box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
+            box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-delete:focus {
+            outline: none;
         }
     </style>
 </head>
@@ -189,16 +221,10 @@ $clients = $clients_query->fetch_all(MYSQLI_ASSOC);
     <!-- Content -->
     <div class="content">
         <div class="container">
-            <div class="row mb-4">
-                <div class="col text-center">
-                    <h2 class="mb-0">Daftar Klien</h2>
-                    <p class="text-muted">Kelola data klien dengan mudah.</p>
-                </div>
-            </div>
-
-            <!-- Table -->
+            <!-- Tabel Klien -->
             <div class="row">
                 <div class="col-12">
+                    <h3 class="mb-4 text-center">Daftar Klien</h3>
                     <table class="table table-striped">
                         <thead>
                             <tr>
@@ -221,9 +247,9 @@ $clients = $clients_query->fetch_all(MYSQLI_ASSOC);
                                 <td><?= htmlspecialchars($client['phone']); ?></td>
                                 <td><?= htmlspecialchars($client['description']); ?></td>
                                 <td>
-                                    <form method="POST" action="delete_client.php" style="display:inline;">
+                                    <form method="POST" action="Konsultanclients.php" style="display:inline;">
                                         <input type="hidden" name="id" value="<?= $client['id']; ?>">
-                                        <button type="submit" class="btn btn-delete">Hapus</button>
+                                        <button type="submit" name="delete_client" class="btn-delete">Hapus</button>
                                     </form>
                                 </td>
                             </tr>

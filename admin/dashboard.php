@@ -15,6 +15,11 @@ $total_clients = $result_clients->fetch_assoc()['total_clients'];
 $sql_admins = "SELECT COUNT(*) AS total_admins FROM admin";
 $result_admins = $conn->query($sql_admins);
 $total_admins = $result_admins->fetch_assoc()['total_admins'];
+
+// Query untuk menghitung jumlah konsultan
+$sql_consultants = "SELECT COUNT(*) AS total_consultants FROM konsultan";
+$result_consultants = $conn->query($sql_consultants);
+$total_consultants = $result_consultants->fetch_assoc()['total_consultants'];
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -112,10 +117,10 @@ $total_admins = $result_admins->fetch_assoc()['total_admins'];
                                 <i class="fas fa-users"></i> Kelola Klien
                             </a>
                         </li>
-                        <!-- Menu Kelola Konsultasi Pajak -->
+                        <!-- Menu Kelola Konsultan -->
                         <li class="nav-item">
-                            <a class="nav-link" href="consultations.php">
-                                <i class="fas fa-file-alt"></i> Kelola Konsultasi Pajak
+                            <a class="nav-link" href="consultants.php">
+                                <i class="fas fa-user-md"></i> Kelola Konsultan
                             </a>
                         </li>
                     </ul>
@@ -150,6 +155,18 @@ $total_admins = $result_admins->fetch_assoc()['total_admins'];
                                 </div>
                                 <h5 class="card-title mt-3">Total Admin</h5>
                                 <p class="card-text"><?php echo $total_admins; ?> Admin</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Kotak Total Konsultan -->
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <div class="card-icon">
+                                    <i class="fas fa-user-md"></i>
+                                </div>
+                                <h5 class="card-title mt-3">Total Konsultan</h5>
+                                <p class="card-text"><?php echo $total_consultants; ?> Konsultan</p>
                             </div>
                         </div>
                     </div>

@@ -1,18 +1,23 @@
 <?php
 session_start();
-require_once '../includes/db_connect.php';
-include '../includes/header_konsultan.php'; // Tambahkan header
+require_once '../includes/db_connect.php'; // Koneksi ke database
+include '../includes/header_klien.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'consultant') {
-    header("Location: ../login_consultant.php");
+// Cek apakah user sudah login
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header("Location: login_client.php");
     exit;
 }
 
-// Ambil riwayat konsultasi
-$riwayat_query = $conn->query("SELECT riwayat_konsultasi.id, riwayat_konsultasi.name, riwayat_konsultasi.email, riwayat_konsultasi.description, riwayat_konsultasi.deleted_at 
-                               FROM riwayat_konsultasi 
-                               ORDER BY riwayat_konsultasi.deleted_at DESC");
-$riwayat = $riwayat_query->fetch_all(MYSQLI_ASSOC);
+// Ambil data klien berdasarkan sesi
+$name = $_SESSION["name"];
+$sql = "SELECT * FROM client WHERE name = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $name);
+$stmt->execute();
+$result = $stmt->get_result();
+$client = $result->fetch_assoc();
+$stmt->close();
 ?>
 
 <!DOCTYPE html>
@@ -20,7 +25,7 @@ $riwayat = $riwayat_query->fetch_all(MYSQLI_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riwayat Penghapusan Klien</title>
+    <title>Dashboard Klien</title>
     <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
     <style>
         /* Global styles */
@@ -117,36 +122,62 @@ $riwayat = $riwayat_query->fetch_all(MYSQLI_ASSOC);
             width: 100%;
         }
 
-        /* Table styling */
-        .table-striped {
-            border: 1px solid #ddd;
-            border-collapse: collapse;
-            width: 100%;
+        /* Card styling */
+        .card {
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
         }
 
-        .table-striped th, .table-striped td {
-            border: 1px solid #ddd;
-            padding: 12px;
+        .card-body {
+            padding: 20px;
+        }
+
+        /* Enhanced main content */
+        .content h2 {
             text-align: center;
-            vertical-align: middle;
-        }
-
-        .table-striped th {
-            background-color: #007bff;
-            color: white;
+            color: #007bff;
             font-weight: bold;
+            margin-bottom: 30px;
         }
 
-        .table-striped tr:nth-child(odd) {
-            background-color: #f9f9f9;
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #007bff;
+            text-align: center;
         }
 
-        .table-striped tr:nth-child(even) {
-            background-color: #ffffff;
+        .card hr {
+            margin: 20px 0;
+            border: 0;
+            height: 1px;
+            background: #ddd;
         }
 
-        .table-striped tr:hover {
-            background-color: #f1f1f1;
+        .card p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
@@ -154,7 +185,7 @@ $riwayat = $riwayat_query->fetch_all(MYSQLI_ASSOC);
     <!-- Header -->
     <div class="header">
         <nav class="navbar navbar-expand-lg navbar-dark">
-            <a class="navbar-brand" href="dashboard_consultant.php">Dashboard Konsultan</a>
+            <a class="navbar-brand" href="dashboard_klien.php">Dashboard Klien</a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
@@ -167,53 +198,42 @@ $riwayat = $riwayat_query->fetch_all(MYSQLI_ASSOC);
 
     <!-- Sidebar -->
     <div class="sidebar">
-        <a href="Konsultanclients.php">Klien</a>
-        <a href="riwayat.php" class="active">Riwayat Konsultasi</a>
+        <a href="riwayat_klien.php">Daftar Riwayat Konsultasi</a>
     </div>
 
-    <!-- Content -->
+    <!-- Main Content -->
     <div class="content">
-        <div class="container">
-            <div class="row mb-4">
-                <div class="col text-center">
-                    <h2 class="mb-0">Riwayat Penghapusan Klien</h2>
-                    <p class="text-muted">Berikut adalah riwayat klien yang telah dihapus.</p>
-                </div>
-            </div>
+        <h2>Selamat Datang di Dashboard Klien</h2>
 
-            <!-- Tabel Riwayat Penghapusan -->
-            <div class="row">
-                <div class="col-12">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Nama Klien</th>
-                                <th>Email</th>
-                                <th>Deskripsi</th>
-                                <th>Waktu Penghapusan</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($riwayat as $index => $item): ?>
-                            <tr>
-                                <td><?= $index + 1; ?></td>
-                                <td><?= htmlspecialchars($item['name']); ?></td>
-                                <td><?= htmlspecialchars($item['email']); ?></td>
-                                <td><?= htmlspecialchars($item['description']); ?></td>
-                                <td><?= htmlspecialchars($item['deleted_at']); ?></td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+        <!-- Kartu Informasi Klien -->
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Informasi Anda</h5>
+                <hr>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div>
+                        <p><span class="info-label">Nama:</span></p>
+                        <p><span class="info-label">Email:</span></p>
+                        <p><span class="info-label">Alamat:</span></p>
+                        <p><span class="info-label">No. Telepon:</span></p>
+                        <p><span class="info-label">Deskripsi:</span></p>
+                    </div>
+                    <div style="text-align: right;">
+                        <p><?php echo htmlspecialchars($client["name"]); ?></p>
+                        <p><?php echo htmlspecialchars($client["email"]); ?></p>
+                        <p><?php echo htmlspecialchars($client["address"]); ?></p>
+                        <p><?php echo htmlspecialchars($client["phone"]); ?></p>
+                        <p><?php echo htmlspecialchars($client["description"]); ?></p>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <a href="riwayat_klien.php" class="btn btn-primary">Lihat Riwayat Klien yang Sudah Konsultasi</a>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Footer -->
-    <footer>
-        <p>&copy; 2025 Your Company. All rights reserved.</p>
-    </footer>
+    <?php include '../includes/footer.php'; ?>
 </body>
 </html>

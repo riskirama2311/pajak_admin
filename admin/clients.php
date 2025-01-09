@@ -85,8 +85,8 @@ $result = $conn->query($sql);
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="consultations.php">
-                                <i class="fas fa-file-alt"></i> Kelola Konsultasi Pajak
+                            <a class="nav-link" href="consultants.php">
+                                <i class="fas fa-user-md"></i> Kelola Konsultan
                             </a>
                         </li>
                     </ul>

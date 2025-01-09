@@ -13,13 +13,11 @@ $total_clients_query = $conn->query("SELECT COUNT(*) as total FROM client");
 $total_clients = $total_clients_query->fetch_assoc()['total'];
 
 // Ambil riwayat konsultasi
-$history_query = $conn->query("
-    SELECT consultation.id, client.name, consultation.date, consultation.description 
-    FROM consultation 
-    JOIN client ON consultation.client_id = client.id 
-    ORDER BY consultation.date DESC
-");
-$consultation_history = $history_query->fetch_all(MYSQLI_ASSOC);
+// Ambil riwayat konsultasi
+$riwayat_query = $conn->query("SELECT riwayat_konsultasi.id, riwayat_konsultasi.name, riwayat_konsultasi.email, riwayat_konsultasi.description, riwayat_konsultasi.deleted_at 
+                               FROM riwayat_konsultasi 
+                               ORDER BY riwayat_konsultasi.deleted_at DESC");
+$riwayat = $riwayat_query->fetch_all(MYSQLI_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -219,21 +217,23 @@ $consultation_history = $history_query->fetch_all(MYSQLI_ASSOC);
                 <div class="col-12">
                     <h3 class="mb-4 text-center">Riwayat Konsultasi</h3>
                     <table class="table table-striped">
-                        <thead>
+                    <thead>
                             <tr>
                                 <th>#</th>
                                 <th>Nama Klien</th>
-                                <th>Tanggal</th>
+                                <th>Email</th>
                                 <th>Deskripsi</th>
+                                <th>Waktu Penghapusan</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($consultation_history as $index => $history): ?>
+                            <?php foreach ($riwayat as $index => $item): ?>
                             <tr>
                                 <td><?= $index + 1; ?></td>
-                                <td><?= htmlspecialchars($history['name']); ?></td>
-                                <td><?= htmlspecialchars($history['date']); ?></td>
-                                <td><?= htmlspecialchars($history['description']); ?></td>
+                                <td><?= htmlspecialchars($item['name']); ?></td>
+                                <td><?= htmlspecialchars($item['email']); ?></td>
+                                <td><?= htmlspecialchars($item['description']); ?></td>
+                                <td><?= htmlspecialchars($item['deleted_at']); ?></td>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>

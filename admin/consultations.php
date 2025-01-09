@@ -139,6 +139,12 @@ $result = $conn->query($sql);
                                 <i class="fas fa-file-alt"></i> Kelola Konsultasi Pajak
                             </a>
                         </li>
+                        <!-- Menu Kelola Konsultan -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="consultants.php">
+                                <i class="fas fa-user-md"></i> Kelola Konsultan
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </nav>

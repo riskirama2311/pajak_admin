@@ -1,15 +1,16 @@
 <?php
 session_start();
-require_once '../includes/db_connect.php';
-include '../includes/header_konsultan.php'; // Tambahkan header
+require_once '../includes/db_connect.php'; // Koneksi ke database
+include '../includes/header_klien.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'consultant') {
-    header("Location: ../login_consultant.php");
+// Cek apakah user sudah login
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header("Location: login_client.php");
     exit;
 }
 
-// Ambil riwayat konsultasi
-$riwayat_query = $conn->query("SELECT riwayat_konsultasi.id, riwayat_konsultasi.name, riwayat_konsultasi.email, riwayat_konsultasi.description, riwayat_konsultasi.deleted_at 
+// Ambil data riwayat konsultasi (seperti pada riwayat.php)
+$riwayat_query = $conn->query("SELECT riwayat_konsultasi.id, riwayat_konsultasi.name, riwayat_konsultasi.email, riwayat_konsultasi.description, DATE(riwayat_konsultasi.deleted_at) AS deleted_date 
                                FROM riwayat_konsultasi 
                                ORDER BY riwayat_konsultasi.deleted_at DESC");
 $riwayat = $riwayat_query->fetch_all(MYSQLI_ASSOC);
@@ -20,7 +21,7 @@ $riwayat = $riwayat_query->fetch_all(MYSQLI_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riwayat Penghapusan Klien</title>
+    <title>Riwayat Konsultasi Klien</title>
     <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
     <style>
         /* Global styles */
@@ -106,6 +107,37 @@ $riwayat = $riwayat_query->fetch_all(MYSQLI_ASSOC);
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
         }
 
+        /* Table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
         /* Footer styling */
         footer {
             background-color: #343a40;
@@ -116,45 +148,13 @@ $riwayat = $riwayat_query->fetch_all(MYSQLI_ASSOC);
             bottom: 0;
             width: 100%;
         }
-
-        /* Table styling */
-        .table-striped {
-            border: 1px solid #ddd;
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        .table-striped th, .table-striped td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        .table-striped th {
-            background-color: #007bff;
-            color: white;
-            font-weight: bold;
-        }
-
-        .table-striped tr:nth-child(odd) {
-            background-color: #f9f9f9;
-        }
-
-        .table-striped tr:nth-child(even) {
-            background-color: #ffffff;
-        }
-
-        .table-striped tr:hover {
-            background-color: #f1f1f1;
-        }
     </style>
 </head>
 <body>
     <!-- Header -->
     <div class="header">
         <nav class="navbar navbar-expand-lg navbar-dark">
-            <a class="navbar-brand" href="dashboard_consultant.php">Dashboard Konsultan</a>
+            <a class="navbar-brand" href="dashboard_klien.php">Dashboard Klien</a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
@@ -167,53 +167,46 @@ $riwayat = $riwayat_query->fetch_all(MYSQLI_ASSOC);
 
     <!-- Sidebar -->
     <div class="sidebar">
-        <a href="Konsultanclients.php">Klien</a>
-        <a href="riwayat.php" class="active">Riwayat Konsultasi</a>
+        <a href="riwayat_klien.php" class="active">Daftar Riwayat Konsultasi</a>
     </div>
 
-    <!-- Content -->
+    <!-- Main Content -->
     <div class="content">
-        <div class="container">
-            <div class="row mb-4">
-                <div class="col text-center">
-                    <h2 class="mb-0">Riwayat Penghapusan Klien</h2>
-                    <p class="text-muted">Berikut adalah riwayat klien yang telah dihapus.</p>
-                </div>
-            </div>
+        <h2 class="mb-4">Daftar Riwayat Konsultasi</h2>
 
-            <!-- Tabel Riwayat Penghapusan -->
-            <div class="row">
-                <div class="col-12">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Nama Klien</th>
-                                <th>Email</th>
-                                <th>Deskripsi</th>
-                                <th>Waktu Penghapusan</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($riwayat as $index => $item): ?>
-                            <tr>
-                                <td><?= $index + 1; ?></td>
-                                <td><?= htmlspecialchars($item['name']); ?></td>
-                                <td><?= htmlspecialchars($item['email']); ?></td>
-                                <td><?= htmlspecialchars($item['description']); ?></td>
-                                <td><?= htmlspecialchars($item['deleted_at']); ?></td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+        <!-- Tabel Riwayat -->
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nama</th>
+                    <th>Email</th>
+                    <th>Deskripsi</th>
+                    <th>Tanggal Konsultasi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (count($riwayat) > 0): ?>
+                    <?php $index = 1; ?>
+                    <?php foreach ($riwayat as $row): ?>
+                        <tr>
+                            <td><?= $index++; ?></td>
+                            <td><?= htmlspecialchars($row["name"]); ?></td>
+                            <td><?= htmlspecialchars($row["email"]); ?></td>
+                            <td><?= htmlspecialchars($row["description"]); ?></td>
+                            <td><?= htmlspecialchars($row["deleted_date"]); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="5">Belum ada riwayat konsultasi.</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
     </div>
 
     <!-- Footer -->
-    <footer>
-        <p>&copy; 2025 Your Company. All rights reserved.</p>
-    </footer>
+    <?php include '../includes/footer.php'; ?>
 </body>
 </html>
