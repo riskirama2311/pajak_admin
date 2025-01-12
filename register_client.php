@@ -70,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION["name"] = $name;
 
                 // Redirect ke halaman dashboard klien
-                header("location: dashboard_klien.php");
+                header("location: admin/dashboard_klien.php");
                 exit;
             } else {
                 echo "Oops! Terjadi kesalahan. Silakan coba lagi nanti.";
